@@ -3,7 +3,7 @@ import NewApiService from './js/apiService';
 import { searchImages } from 'pixabay-api';
 import templatesPictures from './hbs/templatesPictures.hbs';
 import Notiflix from 'notiflix';
-// OPTION 2
+
 const refs = {
   searchForm: document.getElementById('search-form'),
   renderGallery: document.querySelector('.gallery'),
@@ -18,9 +18,9 @@ refs.loadMoreBtn.classList.add('is-hidden');
 
 async function onSearch(e) {
   e.preventDefault();
+  newApiService.query = e.currentTarget.elements.searchQuery.value;
   clearPicturesMarkup();
   newApiService.resetPage();
-  newApiService.query = e.currentTarget.elements.searchQuery.value;
 
   try {
     const result = await newApiService.fetchPhotos();
