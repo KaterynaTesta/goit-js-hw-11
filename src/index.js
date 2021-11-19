@@ -1,12 +1,66 @@
 import './sass/main.scss';
-import { NewApiService } from './js/apiService';
+import NewApiService from './js/apiService';
 import { searchImages } from 'pixabay-api';
-import { Notify } from 'notiflix/build/notiflix-notify-aio';
+import templatesPictures from './hbs/templatesPictures.hbs';
+import Notiflix from 'notiflix';
+// OPTION 2
+const refs = {
+  searchForm: document.getElementById('search-form'),
+  renderGallery: document.querySelector('.gallery'),
+  loadMoreBtn: document.querySelector('.load-more'),
+};
 
-const searchForm = document.querySelector('.search-form');
-const submitBtn = document.querySelector('.button');
-searchForm.addEventListener('submit', onSearch);
+refs.searchForm.addEventListener('submit', onSearch);
+refs.loadMoreBtn.addEventListener('click', onLoad);
 
-function onSearch(event) {
-  evt.preventDefault();
+const newApiService = new NewApiService();
+refs.loadMoreBtn.classList.add('is-hidden');
+
+async function onSearch(e) {
+  e.preventDefault();
+  clearPicturesMarkup();
+  newApiService.resetPage();
+  newApiService.query = e.currentTarget.elements.searchQuery.value;
+
+  try {
+    const result = await newApiService.fetchPhotos();
+
+    if (newApiService.query === '' || result.hits.length === 0) {
+      clearPicturesMarkup();
+      refs.loadMoreBtn.classList.add('is-hidden');
+      Notiflix.Notify.failure(
+        'Sorry, there are no images matching your search query. Please try again.',
+      );
+    } else {
+      refs.loadMoreBtn.classList.remove('is-hidden');
+      Notiflix.Notify.success(`"Hooray! We found ${result.totalHits} images."`);
+      picturesMarkup(result.hits);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+async function onLoad() {
+  try {
+    const result = await newApiService.fetchPhotos();
+    picturesMarkup(result.hits);
+
+    const lenghtHits = refs.renderGallery.querySelectorAll('.photo-card').length;
+
+    if (lenghtHits >= result.totalHits) {
+      Notiflix.Notify.failure('"We are sorry, but you have reached the end of search results."');
+      refs.loadMoreBtn.classList.add('is-hidden');
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+function picturesMarkup(collection) {
+  refs.renderGallery.insertAdjacentHTML('beforeend', templatesPictures(collection));
+}
+
+function clearPicturesMarkup() {
+  refs.renderGallery.innerHTML = '';
 }

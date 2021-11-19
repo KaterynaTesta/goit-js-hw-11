@@ -11,7 +11,12 @@ export default class NewApiService {
     this.page += 1;
     return response.data;
   }
-
+  resetPage() {
+    this.page = 1;
+  }
+  get query() {
+    return this.searchQuery;
+  }
   set query(newQuery) {
     this.searchQuery = newQuery;
   }
