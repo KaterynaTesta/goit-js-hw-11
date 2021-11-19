@@ -9,9 +9,4 @@ searchForm.addEventListener('submit', onSearch);
 
 function onSearch(event) {
   evt.preventDefault();
-  if (formData !== evt.currentTarget.elements.searchQuery.value) {
-    formData = evt.currentTarget.elements.searchQuery.value;
-    galleryWrap.innerHTML = '';
-    loadPictures(formData);
-  }
 }
