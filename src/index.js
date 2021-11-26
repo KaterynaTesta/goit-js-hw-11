@@ -1,7 +1,13 @@
 import './sass/main.scss';
+// Описан в документации
+import SimpleLightbox from 'simplelightbox';
+// Дополнительный импорт стилей
+import 'simplelightbox/dist/simple-lightbox.min.css';
 import NewApiService from './js/apiService';
 import { searchImages } from 'pixabay-api';
+
 import templatesPictures from './hbs/templatesPictures.hbs';
+
 import Notiflix from 'notiflix';
 
 const refs = {
@@ -24,6 +30,8 @@ async function onSearch(e) {
 
   try {
     const result = await newApiService.fetchPhotos();
+    let gallery = new SimpleLightbox('.gallery a');
+    gallery.refresh();
 
     if (newApiService.query === '' || result.hits.length === 0) {
       clearPicturesMarkup();
@@ -45,6 +53,8 @@ async function onLoad() {
   try {
     const result = await newApiService.fetchPhotos();
     picturesMarkup(result.hits);
+    let gallery = new SimpleLightbox('.gallery a');
+    gallery.refresh();
 
     const lenghtHits = refs.renderGallery.querySelectorAll('.photo-card').length;
 
@@ -52,6 +62,12 @@ async function onLoad() {
       Notiflix.Notify.failure('"We are sorry, but you have reached the end of search results."');
       refs.loadMoreBtn.classList.add('is-hidden');
     }
+    const { height: cardHeight } = renderGallery.firstElementChild.getBoundingClientRect();
+
+    renderGallery.scrollBy({
+      top: cardHeight * 2,
+      behavior: 'smooth',
+    });
   } catch (error) {
     console.log(error);
   }
@@ -59,6 +75,7 @@ async function onLoad() {
 
 function picturesMarkup(collection) {
   refs.renderGallery.insertAdjacentHTML('beforeend', templatesPictures(collection));
+  newApiService.createGallery();
 }
 
 function clearPicturesMarkup() {

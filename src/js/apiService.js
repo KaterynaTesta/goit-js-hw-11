@@ -1,4 +1,5 @@
 import axios from 'axios';
+import SimpleLightbox from 'simplelightbox';
 
 export default class NewApiService {
   constructor() {
@@ -21,6 +22,9 @@ export default class NewApiService {
   }
   set query(newQuery) {
     this.searchQuery = newQuery;
+  }
+  createGallery() {
+    this.gallery = new SimpleLightbox('.gallery a');
   }
 }
 // const API_KEY = '24397796-604c3a9fc6ff44cceee5653ad';
